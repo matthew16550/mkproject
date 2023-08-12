@@ -1,0 +1,40 @@
+#! /usr/bin/env bash
+
+set -e
+
+BASEDIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )/.." &> /dev/null && pwd )
+
+if [[ $# -ne 1 ]]; then
+  echo "Usage: `basename $0` <NAME>"
+  exit 1
+fi
+
+NAME="$1"
+
+if [[ -e "${NAME}" ]]; then
+  echo "'${NAME}' dir already exists"
+  exit 1
+fi
+
+mkdir "${NAME}"
+
+cd "${NAME}"
+
+git init
+
+git ci --allow-empty -m "Initial empty commit"
+
+cp -RLv "${BASEDIR}/template/go/" .
+
+cat <<EOF >>.editorconfig
+
+[{Makefile,go.mod,go.sum,*.go,.gitmodules}]
+indent_style = tab
+indent_size = 4
+EOF
+
+go mod init "${NAME}"
+
+git add .
+
+git ci -m "Add skeleton files"
