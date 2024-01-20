@@ -1,0 +1,9 @@
+#compdef mkproject-python
+
+local ret=1
+
+if [[ ${#words[@]} -eq 3 ]]; then
+  compadd -- $(pyenv versions --bare --skip-aliases --skip-envs) && ret=0
+fi
+
+return ret

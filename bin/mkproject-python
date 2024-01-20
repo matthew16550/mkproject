@@ -1,0 +1,51 @@
+#! /usr/bin/env bash
+
+set -e
+
+BASEDIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )/.." &> /dev/null && pwd )
+
+if [[ $# -ne 2 ]]; then
+  echo "Usage: `basename $0` <NAME> <PYTHON_VERSION>"
+  exit 1
+fi
+
+NAME="$1"
+PYTHON_VERSION="$2"
+
+if [[ -e "${NAME}" ]]; then
+  echo "'${NAME}' dir already exists"
+  exit 1
+fi
+
+if [[ $(pyenv prefix "${PYTHON_VERSION}" 2>/dev/null) != */${PYTHON_VERSION} ]]; then
+  echo -e "\nPlease use an installed python version:"
+  pyenv versions --bare --skip-aliases --skip-envs
+  exit 1
+fi
+
+mkdir "${NAME}"
+
+cd "${NAME}"
+
+git init
+
+git ci --allow-empty -m "Initial empty commit"
+
+cp -RLv "${BASEDIR}/template/python/" .
+
+cat <<EOF >>.editorconfig
+
+[.py]
+indent_size = 4
+EOF
+
+cat <<EOF >>.envrc
+export VIRTUAL_ENV=.venv
+layout pyenv ${PYTHON_VERSION}
+EOF
+
+git add .
+
+git ci -m "Add skeleton files"
+
+direnv allow .
