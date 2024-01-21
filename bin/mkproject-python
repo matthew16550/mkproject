@@ -35,7 +35,7 @@ cp -RLv "${BASEDIR}/template/python/" .
 
 cat <<EOF >>.editorconfig
 
-[.py]
+[*.py]
 indent_size = 4
 EOF
 
