@@ -8,13 +8,22 @@ print_installed_python_versions() {
   pyenv versions --bare --skip-aliases --skip-envs
 }
 
-if [[ $# -ne 2 ]]; then
-  cat <<EOF
-Usage: `basename $0` <NAME> <PYTHON_VERSION>
+print_help() {
+    cat <<EOF
+Usage: `basename $0` [-h] <NAME> <PYTHON_VERSION>
 
 Installed python versions:
 $(print_installed_python_versions)
 EOF
+}
+
+if [[ "$1" == '-h' ]]; then
+  print_help
+  exit
+fi
+
+if [[ $# -ne 2 ]]; then
+  print_help
   exit 1
 fi
 
