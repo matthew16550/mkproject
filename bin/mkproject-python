@@ -4,8 +4,17 @@ set -e
 
 BASEDIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )/.." &> /dev/null && pwd )
 
+print_installed_python_versions() {
+  pyenv versions --bare --skip-aliases --skip-envs
+}
+
 if [[ $# -ne 2 ]]; then
-  echo "Usage: `basename $0` <NAME> <PYTHON_VERSION>"
+  cat <<EOF
+Usage: `basename $0` <NAME> <PYTHON_VERSION>
+
+Installed python versions:
+$(print_installed_python_versions)
+EOF
   exit 1
 fi
 
@@ -19,7 +28,7 @@ fi
 
 if [[ $(pyenv prefix "${PYTHON_VERSION}" 2>/dev/null) != */${PYTHON_VERSION} ]]; then
   echo -e "\nPlease use an installed python version:"
-  pyenv versions --bare --skip-aliases --skip-envs
+  print_installed_python_versions
   exit 1
 fi
 
