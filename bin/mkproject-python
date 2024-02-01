@@ -4,13 +4,16 @@ set -e
 
 BASEDIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )/.." &> /dev/null && pwd )
 
+SCRIPT_NAME="$(basename $0)"
+SCRIPT_VERSION="$(git -C "${BASEDIR}" describe --always --dirty)"
+
 print_installed_python_versions() {
   pyenv versions --bare --skip-aliases --skip-envs
 }
 
 print_help() {
     cat <<EOF
-Usage: `basename $0` [-h] <NAME> <PYTHON_VERSION>
+Usage: ${SCRIPT_NAME} [-h] <NAME> <PYTHON_VERSION>
 
 Installed python versions:
 $(print_installed_python_versions)
@@ -47,7 +50,7 @@ cd "${NAME}"
 
 git init
 
-git ci --allow-empty -m "Initial empty commit"
+git ci --allow-empty -m "Initial empty commit (from ${SCRIPT_NAME} ${SCRIPT_VERSION})"
 
 cp -RLv "${BASEDIR}/template/python/" .
 

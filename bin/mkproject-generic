@@ -4,8 +4,11 @@ set -e
 
 BASEDIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )/.." &> /dev/null && pwd )
 
+SCRIPT_NAME="$(basename $0)"
+SCRIPT_VERSION="$(git -C "${BASEDIR}" describe --always --dirty)"
+
 if [[ $# -ne 1 ]]; then
-  echo "Usage: `basename $0` <NAME>"
+  echo "Usage: ${SCRIPT_NAME} <NAME>"
   exit 1
 fi
 
@@ -22,7 +25,7 @@ cd "${NAME}"
 
 git init
 
-git ci --allow-empty -m "Initial empty commit"
+git ci --allow-empty -m "Initial empty commit (from ${SCRIPT_NAME} ${SCRIPT_VERSION})"
 
 cp -RLv "${BASEDIR}/template/generic/" .
 
