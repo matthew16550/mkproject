@@ -41,7 +41,7 @@ if [[ $(pyenv prefix "${PYTHON_VERSION}" 2>/dev/null) != */${PYTHON_VERSION} ]];
   exit 1
 fi
 
-mkdir "${NAME}"
+mkdir -p "${NAME}"
 
 cd "${NAME}"
 

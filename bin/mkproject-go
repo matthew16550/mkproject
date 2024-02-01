@@ -16,7 +16,7 @@ if [[ -e "${NAME}" ]]; then
   exit 1
 fi
 
-mkdir "${NAME}"
+mkdir -p "${NAME}"
 
 cd "${NAME}"
 
