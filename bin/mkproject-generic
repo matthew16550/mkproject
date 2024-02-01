@@ -26,6 +26,8 @@ git ci --allow-empty -m "Initial empty commit"
 
 cp -RLv "${BASEDIR}/template/generic/" .
 
+pre-commit install
+
 git add .
 
 git ci -m "Add skeleton files"

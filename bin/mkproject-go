@@ -35,6 +35,8 @@ EOF
 
 go mod init "${NAME}"
 
+pre-commit install
+
 git add .
 
 git ci -m "Add skeleton files"

@@ -62,6 +62,8 @@ export VIRTUAL_ENV=.venv
 layout pyenv ${PYTHON_VERSION}
 EOF
 
+pre-commit install
+
 git add .
 
 git ci -m "Add skeleton files"
