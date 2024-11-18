@@ -61,8 +61,9 @@ indent_size = 4
 EOF
 
 cat <<EOF >>.envrc
+export PYENV_VERSION=${PYTHON_VERSION}
 export VIRTUAL_ENV=.venv
-layout pyenv ${PYTHON_VERSION}
+layout python python3
 EOF
 
 pre-commit install
