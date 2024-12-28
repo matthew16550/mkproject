@@ -60,11 +60,7 @@ cat <<EOF >>.editorconfig
 indent_size = 4
 EOF
 
-cat <<EOF >>.envrc
-export PYENV_VERSION=${PYTHON_VERSION}
-export VIRTUAL_ENV=.venv
-layout python python3
-EOF
+echo "${PYTHON_VERSION}" > .python-version
 
 pre-commit install
 
