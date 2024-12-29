@@ -54,12 +54,6 @@ git ci --allow-empty -m "Initial empty commit (from ${SCRIPT_NAME} ${SCRIPT_VERS
 
 cp -RLv "${BASEDIR}/template/python/" .
 
-cat <<EOF >>.editorconfig
-
-[*.py]
-indent_size = 4
-EOF
-
 echo "${PYTHON_VERSION}" > .python-version
 
 pre-commit install
