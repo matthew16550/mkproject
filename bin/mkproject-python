@@ -1,11 +1,16 @@
 #! /usr/bin/env bash
 
 set -e
+shopt -s dotglob
+shopt -s globstar
 
 BASEDIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )/.." &> /dev/null && pwd )
 
 SCRIPT_NAME="$(basename $0)"
-SCRIPT_VERSION="$(git -C "${BASEDIR}" describe --always --dirty)"
+
+log() {
+  echo -e "\n$1"
+}
 
 print_installed_python_versions() {
   pyenv versions --bare --skip-aliases --skip-envs
@@ -33,8 +38,10 @@ fi
 NAME="$1"
 PYTHON_VERSION="$2"
 
-if [[ -e "${NAME}" ]]; then
-  echo "'${NAME}' dir already exists"
+TARGET_DIR="${PWD}/${NAME}"
+
+if [[ -e "${TARGET_DIR}" ]]; then
+  echo "'${TARGET_DIR}' dir already exists"
   exit 1
 fi
 
@@ -44,22 +51,68 @@ if [[ $(pyenv prefix "${PYTHON_VERSION}" 2>/dev/null) != */${PYTHON_VERSION} ]];
   exit 1
 fi
 
-mkdir -p "${NAME}"
+cat <<EOF
+Finding mkproject version ...
 
-cd "${NAME}"
+NOTE: This possible error can be ignored.
+      (warning: unable to access 'template/python/.gitattributes': Too many levels of symbolic links)
+EOF
+
+SCRIPT_VERSION="$(git -C "${BASEDIR}" describe --always --dirty)"
+
+log "Creating target dir ..."
+
+mkdir -p "${TARGET_DIR}"
+
+cd "${TARGET_DIR}"
+
+log "Initialising git repo ..."
 
 git init
 
+log "Git empty commit ..."
+
 git ci --allow-empty -m "Initial empty commit (from ${SCRIPT_NAME} ${SCRIPT_VERSION})"
 
-cp -RLv "${BASEDIR}/template/python/" .
+log "Adding template files ..."
 
-echo "${PYTHON_VERSION}" > .python-version
+pushd "${BASEDIR}/template/python" >/dev/null
+
+find -s . -print0 | while read -d '' -r path; do
+  echo "Adding ${path}"
+  if [ -d "${path}" ]; then
+    mkdir -p "${TARGET_DIR}/${path}"
+  else
+    sed "s/MKPROJECT_PROJECT_NAME/${NAME}/g; s/MKPROJECT_PYTHON_VERSION/${PYTHON_VERSION}/" "${path}" > "${TARGET_DIR}/${path}"
+  fi
+done
+
+popd >/dev/null
+
+log "Installing pre-commit ..."
 
 pre-commit install
 
-git add .
+log "Allowing direnv ..."
+
+direnv allow .
+
+log "Installing bootstrap packages ..."
+
+direnv exec . pip install --upgrade fabric pip pip-tools
+
+log "Generating requirements ..."
+
+direnv exec . fab generate-requirements
+
+log "Adding files to git ..."
+
+git add -v .
+
+log "Git skeleton commit ..."
 
 git ci -m "Add skeleton files"
 
-direnv allow .
+log "Dev setup ..."
+
+direnv exec . fab dev-setup

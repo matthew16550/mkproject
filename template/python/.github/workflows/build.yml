@@ -1,0 +1,51 @@
+name: Build
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - '*.md'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set env vars
+        run: echo "IMAGE_OS=$ImageOS" >> "$GITHUB_ENV"
+
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup python
+        uses: actions/setup-python@v5
+        with:
+          python-version-file: '.python-version'
+          cache: 'pip'
+          cache-dependency-path: 'requirements.txt'
+
+      - name: Cache mypy results
+        uses: actions/cache@v4
+        with:
+          path: .mypy_cache
+          key: mypy-${{env.IMAGE_OS}}-${{ env.pythonLocation }}-${{ hashFiles('requirements.txt') }}
+
+      - name: Cache ruff results
+        uses: actions/cache@v4
+        with:
+          path: .ruff_cache
+          key: ruff-${{env.IMAGE_OS}}-${{ env.pythonLocation }}-${{ hashFiles('requirements.txt') }}
+
+      - name: Install dependencies
+        run: pip install --require-hashes -r requirements.txt
+
+      - name: ruff
+        run: fab ruff
+
+      - name: mypy
+        run: fab mypy
+
+      - name: test
+        run: fab test
